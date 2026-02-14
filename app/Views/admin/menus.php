@@ -1,4 +1,4 @@
-﻿<h1 class="text-2xl font-bold mb-4">תפריטים</h1>
+<h1 class="text-2xl font-bold mb-4">תפריטים</h1>
 <?php if (($_GET['error'] ?? '') === 'dates'): ?>
     <div class="bg-red-100 text-red-800 p-3 rounded mb-4">טווח תאריכים לא תקין.</div>
 <?php endif; ?>
@@ -35,7 +35,7 @@
                     <td class="p-2"><?php echo e($m['station_name']); ?></td>
                     <td class="p-2"><?php echo e($m['period_start']); ?></td>
                     <td class="p-2"><?php echo e($m['period_end']); ?></td>
-                    <td class="p-2"><a class="text-blue-600" href="/admin/menus/<?php echo (int)$m['id']; ?>">עריכה</a></td>
+                    <td class="p-2"><a class="text-blue-600" href="<?php echo e(app_url('/admin/menus/' . (int)$m['id'])); ?>">עריכה</a></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

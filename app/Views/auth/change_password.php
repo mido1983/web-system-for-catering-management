@@ -1,4 +1,4 @@
-﻿<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
     <h1 class="text-2xl font-bold mb-4">החלפת סיסמה</h1>
     <form method="post">
         <?php echo csrf_field(); ?>

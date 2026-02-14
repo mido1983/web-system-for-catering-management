@@ -1,4 +1,4 @@
-﻿<h1 class="text-2xl font-bold mb-4">לוג פעולות</h1>
+<h1 class="text-2xl font-bold mb-4">לוג פעולות</h1>
 
 <form method="get" class="bg-white p-4 rounded shadow mb-4 grid grid-cols-1 md:grid-cols-4 gap-2">
     <input class="border p-2" type="number" name="user_id" placeholder="מזהה משתמש" value="<?php echo e($filters['user_id']); ?>">

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use App\Services\AuthService;
 
 if (!function_exists('e')) {
@@ -29,5 +29,32 @@ if (!function_exists('current_user')) {
     function current_user(): ?array
     {
         return AuthService::currentUser();
+    }
+}
+
+if (!function_exists('app_base_path')) {
+    function app_base_path(): string
+    {
+        $base = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+        if ($base === '/' || $base === '\\') {
+            return '';
+        }
+        return rtrim($base, '/');
+    }
+}
+
+if (!function_exists('app_url')) {
+    function app_url(string $path = '/'): string
+    {
+        if ($path === '') {
+            $path = '/';
+        }
+        if (preg_match('#^https?://#i', $path)) {
+            return $path;
+        }
+        if ($path[0] !== '/') {
+            $path = '/' . $path;
+        }
+        return app_base_path() . $path;
     }
 }

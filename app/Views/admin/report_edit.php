@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $wasteByDish = [];
 foreach ($waste_items as $wi) {
     $wasteByDish[$wi['dish_id']] = $wi;

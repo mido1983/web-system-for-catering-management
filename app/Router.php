@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace App;
 
 use App\Middleware\Auth;
@@ -31,6 +31,18 @@ class Router
     public function dispatch(string $method, string $uri): void
     {
         $path = parse_url($uri, PHP_URL_PATH) ?? '/';
+        $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+        if ($scriptDir !== '' && $scriptDir !== '/') {
+            $scriptDir = rtrim($scriptDir, '/');
+            if (str_starts_with($path, $scriptDir . '/')) {
+                $path = substr($path, strlen($scriptDir));
+            } elseif ($path === $scriptDir) {
+                $path = '/';
+            }
+        }
+        if ($path === '') {
+            $path = '/';
+        }
 
         foreach ($this->routes as $route) {
             if ($route['method'] !== $method) {

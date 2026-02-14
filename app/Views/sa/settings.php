@@ -1,4 +1,4 @@
-﻿<h1 class="text-2xl font-bold mb-4">הגדרות</h1>
+<h1 class="text-2xl font-bold mb-4">הגדרות</h1>
 <form method="post" class="bg-white p-4 rounded shadow grid grid-cols-1 md:grid-cols-2 gap-2">
     <?php echo csrf_field(); ?>
     <div>

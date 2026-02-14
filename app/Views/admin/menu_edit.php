@@ -1,4 +1,4 @@
-﻿<h1 class="text-2xl font-bold mb-4">עריכת תפריט</h1>
+<h1 class="text-2xl font-bold mb-4">עריכת תפריט</h1>
 <div class="bg-white p-4 rounded shadow mb-6">
     <div>תקופה: <?php echo e($menu['period_start']); ?> עד <?php echo e($menu['period_end']); ?></div>
     <div>גרסה: <?php echo e($draft['version_number']); ?> (DRAFT)</div>
@@ -39,7 +39,7 @@
     </div>
 </form>
 
-<form method="post" action="/admin/menus/<?php echo (int)$menu['id']; ?>/publish" class="mt-4">
+<form method="post" action="<?php echo e(app_url('/admin/menus/' . (int)$menu['id'] . '/publish')); ?>" class="mt-4">
     <?php echo csrf_field(); ?>
     <button class="bg-green-600 text-white px-4 py-2 rounded">פרסום תפריט</button>
 </form>

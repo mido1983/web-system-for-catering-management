@@ -1,4 +1,4 @@
-﻿<h1 class="text-2xl font-bold mb-4">דוחות</h1>
+<h1 class="text-2xl font-bold mb-4">דוחות</h1>
 
 <form method="get" class="bg-white p-4 rounded shadow mb-4 grid grid-cols-1 md:grid-cols-4 gap-2">
     <select class="border p-2" name="station_id">
@@ -32,7 +32,7 @@
                     <td class="p-2"><?php echo e($r['sibus_ok']); ?></td>
                     <td class="p-2"><?php echo e($r['sibus_manual']); ?></td>
                     <td class="p-2"><?php echo e($r['detainees']); ?></td>
-                    <td class="p-2"><a class="text-blue-600" href="/admin/reports/<?php echo (int)$r['id']; ?>">עריכה</a></td>
+                    <td class="p-2"><a class="text-blue-600" href="<?php echo e(app_url('/admin/reports/' . (int)$r['id'])); ?>">עריכה</a></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

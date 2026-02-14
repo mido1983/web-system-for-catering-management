@@ -1,4 +1,4 @@
-﻿<h1 class="text-2xl font-bold mb-4">תחנות</h1>
+<h1 class="text-2xl font-bold mb-4">תחנות</h1>
 <div class="space-y-3">
     <?php foreach ($stations as $s): ?>
         <form method="post" class="bg-white p-4 rounded shadow flex items-center gap-3">

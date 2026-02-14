@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 namespace App\Middleware;
 
 use App\Services\AuthService;
@@ -8,7 +8,7 @@ class Auth
     public static function requireLogin(): void
     {
         if (!AuthService::currentUser()) {
-            header('Location: /login');
+            header('Location: ' . app_url('/login'));
             exit;
         }
     }

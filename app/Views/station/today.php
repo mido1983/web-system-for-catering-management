@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $menuItems = $menu['items'] ?? [];
 $menuVersionId = $menu['version']['id'] ?? 0;
 $polling = (int)($settings['polling_seconds'] ?? 60);
@@ -140,7 +140,7 @@ $report = $report ?? null;
 
     <?php if ($menuVersionId > 0): ?>
     setInterval(function(){
-        fetch('/station/today?check=1')
+        fetch('<?php echo e(app_url('/station/today')); ?>?check=1')
             .then(function(r){ return r.json(); })
             .then(function(data){
                 if (data.version_id && data.version_id !== <?php echo (int)$menuVersionId; ?>) {

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use App\Core\ErrorHandler;
 use App\Router;
 use App\Controllers\AuthController;
@@ -51,6 +51,11 @@ $auth = new AuthController();
 $station = new StationController();
 $admin = new AdminController();
 $sa = new SuperAdminController();
+
+$router->get('/', function (): void {
+    header('Location: ' . app_url('/login'));
+    exit;
+});
 
 $router->get('/login', [$auth, 'showLogin']);
 $router->post('/login', [$auth, 'login']);

@@ -1,4 +1,4 @@
-﻿<h1 class="text-2xl font-bold mb-4">מנהלי מערכת</h1>
+<h1 class="text-2xl font-bold mb-4">מנהלי מערכת</h1>
 
 <div class="bg-white p-4 rounded shadow mb-6">
     <h2 class="font-bold mb-2">יצירת מנהל</h2>

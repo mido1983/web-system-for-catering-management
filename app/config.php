@@ -1,10 +1,10 @@
-﻿<?php
+<?php
 return [
     'db' => [
         'host' => 'localhost',
         'name' => 'catering_db',
-        'user' => 'db_user',
-        'pass' => 'db_pass',
+        'user' => 'root',
+        'pass' => '',
         'charset' => 'utf8mb4',
     ],
     'app' => [

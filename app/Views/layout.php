@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $user = current_user();
 ?>
 <!doctype html>
@@ -18,24 +18,24 @@ $user = current_user();
                     <div class="font-bold"><?php echo e($title ?? ''); ?></div>
                     <div class="text-sm">
                         <?php if ($user['role'] === 'SUPERADMIN'): ?>
-                            <a class="ml-3" href="/sa/admins">מנהלים</a>
-                            <a class="ml-3" href="/sa/stations">תחנות</a>
-                            <a class="ml-3" href="/sa/users">משתמשים</a>
-                            <a class="ml-3" href="/sa/settings">הגדרות</a>
-                            <a class="ml-3" href="/sa/audit">לוג</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/sa/admins')); ?>">מנהלים</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/sa/stations')); ?>">תחנות</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/sa/users')); ?>">משתמשים</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/sa/settings')); ?>">הגדרות</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/sa/audit')); ?>">לוג</a>
                         <?php elseif ($user['role'] === 'ADMIN'): ?>
-                            <a class="ml-3" href="/admin/dashboard">דשבורד</a>
-                            <a class="ml-3" href="/admin/stations">תחנות</a>
-                            <a class="ml-3" href="/admin/users">משתמשים</a>
-                            <a class="ml-3" href="/admin/menus">תפריטים</a>
-                            <a class="ml-3" href="/admin/reports">דוחות</a>
-                            <a class="ml-3" href="/admin/planner">תכנון</a>
-                            <a class="ml-3" href="/admin/audit">לוג</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/admin/dashboard')); ?>">דשבורד</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/admin/stations')); ?>">תחנות</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/admin/users')); ?>">משתמשים</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/admin/menus')); ?>">תפריטים</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/admin/reports')); ?>">דוחות</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/admin/planner')); ?>">תכנון</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/admin/audit')); ?>">לוג</a>
                         <?php else: ?>
-                            <a class="ml-3" href="/station/today">היום</a>
-                            <a class="ml-3" href="/station/history">היסטוריה</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/station/today')); ?>">היום</a>
+                            <a class="ml-3" href="<?php echo e(app_url('/station/history')); ?>">היסטוריה</a>
                         <?php endif; ?>
-                        <a class="ml-3 text-red-600" href="/logout">יציאה</a>
+                        <a class="ml-3 text-red-600" href="<?php echo e(app_url('/logout')); ?>">יציאה</a>
                     </div>
                 </div>
             </nav>
