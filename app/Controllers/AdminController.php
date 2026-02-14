@@ -86,8 +86,12 @@ class AdminController extends BaseController
         $stationId = (int)($_POST['station_id'] ?? 0);
         $tempPassword = trim($_POST['temp_password'] ?? '');
         $jobTitle = trim($_POST['job_title'] ?? '');
+        $firstName = trim($_POST['first_name'] ?? '');
+        $lastName = trim($_POST['last_name'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $workHours = trim($_POST['work_hours'] ?? '');
 
-        if ($email === '' || $stationId < 1 || $tempPassword === '' || !in_array($jobTitle, UserModel::jobTitles(), true)) {
+        if ($email === '' || $stationId < 1 || $tempPassword === '' || !in_array($jobTitle, UserModel::jobTitles(), true) || $firstName === '' || $lastName === '' || $phone === '' || $workHours === '') {
             $this->redirect('/admin/users');
         }
 
@@ -106,6 +110,10 @@ class AdminController extends BaseController
             'admin_id' => $user['id'],
             'station_id' => $stationId,
             'job_title' => $jobTitle,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'phone' => $phone,
+            'work_hours' => $workHours,
             'must_change_password' => 1,
             'is_active' => 1,
         ]);
@@ -119,7 +127,6 @@ class AdminController extends BaseController
         $user = AuthService::currentUser();
         $userId = (int)($_POST['user_id'] ?? 0);
         $tempPassword = trim($_POST['temp_password'] ?? '');
-        $jobTitle = trim($_POST['job_title'] ?? '');
         if ($userId < 1 || $tempPassword === '') {
             $this->redirect('/admin/users');
         }

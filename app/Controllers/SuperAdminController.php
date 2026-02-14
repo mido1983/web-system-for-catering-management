@@ -23,7 +23,11 @@ class SuperAdminController extends BaseController
     {
         $email = trim($_POST['email'] ?? '');
         $tempPassword = trim($_POST['temp_password'] ?? '');
-        if ($email === '' || $tempPassword === '') {
+        $firstName = trim($_POST['first_name'] ?? '');
+        $lastName = trim($_POST['last_name'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $workHours = trim($_POST['work_hours'] ?? '');
+        if ($email === '' || $tempPassword === '' || $firstName === '' || $lastName === '' || $phone === '' || $workHours === '') {
             $this->redirect('/sa/admins');
         }
         $hash = password_hash($tempPassword, PASSWORD_BCRYPT);
@@ -34,6 +38,10 @@ class SuperAdminController extends BaseController
             'admin_id' => null,
             'station_id' => null,
             'job_title' => null,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'phone' => $phone,
+            'work_hours' => $workHours,
             'must_change_password' => 1,
             'is_active' => 1,
         ]);
@@ -136,8 +144,12 @@ class SuperAdminController extends BaseController
         $adminId = (int)($_POST['admin_id'] ?? 0);
         $stationId = (int)($_POST['station_id'] ?? 0);
         $jobTitle = trim($_POST['job_title'] ?? '');
+        $firstName = trim($_POST['first_name'] ?? '');
+        $lastName = trim($_POST['last_name'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $workHours = trim($_POST['work_hours'] ?? '');
 
-        if ($email === '' || $tempPassword === '' || !in_array($role, ['SUPERADMIN', 'ADMIN', 'STATION_USER'], true)) {
+        if ($email === '' || $tempPassword === '' || !in_array($role, ['SUPERADMIN', 'ADMIN', 'STATION_USER'], true) || $firstName === '' || $lastName === '' || $phone === '' || $workHours === '') {
             $this->redirect('/sa/users');
         }
 
@@ -148,6 +160,10 @@ class SuperAdminController extends BaseController
             'admin_id' => null,
             'station_id' => null,
             'job_title' => null,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'phone' => $phone,
+            'work_hours' => $workHours,
             'must_change_password' => 1,
             'is_active' => 1,
         ];
@@ -175,9 +191,13 @@ class SuperAdminController extends BaseController
         $adminId = (int)($_POST['admin_id'] ?? 0);
         $stationId = (int)($_POST['station_id'] ?? 0);
         $jobTitle = trim($_POST['job_title'] ?? '');
+        $firstName = trim($_POST['first_name'] ?? '');
+        $lastName = trim($_POST['last_name'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $workHours = trim($_POST['work_hours'] ?? '');
         $isActive = (int)($_POST['is_active'] ?? 1);
 
-        if ($userId < 1 || $email === '' || !in_array($role, ['SUPERADMIN', 'ADMIN', 'STATION_USER'], true)) {
+        if ($userId < 1 || $email === '' || !in_array($role, ['SUPERADMIN', 'ADMIN', 'STATION_USER'], true) || $firstName === '' || $lastName === '' || $phone === '' || $workHours === '') {
             $this->redirect('/sa/users');
         }
 
@@ -192,6 +212,10 @@ class SuperAdminController extends BaseController
             'admin_id' => null,
             'station_id' => null,
             'job_title' => null,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'phone' => $phone,
+            'work_hours' => $workHours,
             'is_active' => $isActive === 1 ? 1 : 0,
         ];
         if ($role === 'STATION_USER') {
