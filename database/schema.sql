@@ -8,11 +8,11 @@ CREATE TABLE users (
     role ENUM('SUPERADMIN','ADMIN','STATION_USER') NOT NULL,
     admin_id INT NULL,
     station_id INT NULL,
+    job_title VARCHAR(120) NULL,
     must_change_password TINYINT(1) NOT NULL DEFAULT 0,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     last_login_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_users_station_id (station_id)
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE stations (

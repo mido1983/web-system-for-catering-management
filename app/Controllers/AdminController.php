@@ -23,8 +23,9 @@ class AdminController extends BaseController
         $user = AuthService::currentUser();
         $stations = StationModel::listByAdmin((int)$user['id']);
         $this->render('admin/dashboard', [
-            'title' => 'דשבורד',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ',
             'stations' => $stations,
+            'job_titles' => UserModel::jobTitles(),
         ]);
     }
 
@@ -34,8 +35,9 @@ class AdminController extends BaseController
         $stations = StationModel::listByAdmin((int)$user['id']);
 
         $this->render('admin/stations', [
-            'title' => 'תחנות',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂªÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Âª',
             'stations' => $stations,
+            'job_titles' => UserModel::jobTitles(),
         ]);
     }
 
@@ -52,7 +54,7 @@ class AdminController extends BaseController
         $station = StationModel::findById($stationId);
         if (!$station || (int)$station['admin_id'] !== (int)$user['id']) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
 
@@ -70,9 +72,10 @@ class AdminController extends BaseController
         $stationUsers = UserModel::listStationUsersByAdmin((int)$user['id']);
         $stations = StationModel::listByAdmin((int)$user['id']);
         $this->render('admin/users', [
-            'title' => 'משתמשי תחנה',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂªÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂªÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â',
             'users' => $stationUsers,
             'stations' => $stations,
+            'job_titles' => UserModel::jobTitles(),
         ]);
     }
 
@@ -82,20 +85,17 @@ class AdminController extends BaseController
         $email = trim($_POST['email'] ?? '');
         $stationId = (int)($_POST['station_id'] ?? 0);
         $tempPassword = trim($_POST['temp_password'] ?? '');
+        $jobTitle = trim($_POST['job_title'] ?? '');
 
-        if ($email === '' || $stationId < 1 || $tempPassword === '') {
+        if ($email === '' || $stationId < 1 || $tempPassword === '' || !in_array($jobTitle, UserModel::jobTitles(), true)) {
             $this->redirect('/admin/users');
         }
 
         $station = StationModel::findById($stationId);
         if (!$station || (int)$station['admin_id'] !== (int)$user['id']) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
-        }
-
-        if (UserModel::findStationUserByStationId($stationId)) {
-            $this->redirect('/admin/users?error=station_has_user');
         }
 
         $hash = password_hash($tempPassword, PASSWORD_BCRYPT);
@@ -105,6 +105,7 @@ class AdminController extends BaseController
             'role' => 'STATION_USER',
             'admin_id' => $user['id'],
             'station_id' => $stationId,
+            'job_title' => $jobTitle,
             'must_change_password' => 1,
             'is_active' => 1,
         ]);
@@ -118,6 +119,7 @@ class AdminController extends BaseController
         $user = AuthService::currentUser();
         $userId = (int)($_POST['user_id'] ?? 0);
         $tempPassword = trim($_POST['temp_password'] ?? '');
+        $jobTitle = trim($_POST['job_title'] ?? '');
         if ($userId < 1 || $tempPassword === '') {
             $this->redirect('/admin/users');
         }
@@ -126,7 +128,7 @@ class AdminController extends BaseController
         $allowed = array_filter($stationUsers, fn($u) => (int)$u['id'] === $userId);
         if (!$allowed) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
 
@@ -145,7 +147,7 @@ class AdminController extends BaseController
         $allowed = array_filter($stationUsers, fn($u) => (int)$u['id'] === $userId);
         if (!$allowed) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
         UserModel::setActive($userId, $active);
@@ -159,9 +161,10 @@ class AdminController extends BaseController
         $menus = MenuService::listMenusByAdmin((int)$user['id']);
         $stations = StationModel::listByAdmin((int)$user['id']);
         $this->render('admin/menus', [
-            'title' => 'תפריטים',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂªÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â',
             'menus' => $menus,
             'stations' => $stations,
+            'job_titles' => UserModel::jobTitles(),
         ]);
     }
 
@@ -182,7 +185,7 @@ class AdminController extends BaseController
         $station = StationModel::findById($stationId);
         if (!$station || (int)$station['admin_id'] !== (int)$user['id']) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
 
@@ -199,13 +202,13 @@ class AdminController extends BaseController
         $station = StationModel::findById((int)$data['menu']['station_id']);
         if (!$station || (int)$station['admin_id'] !== (int)$user['id']) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
         $versions = MenuVersionModel::listByMenu($menuId);
 
         $this->render('admin/menu_edit', [
-            'title' => 'עריכת תפריט',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂºÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Âª ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂªÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¹Ã…â€œ',
             'menu' => $data['menu'],
             'draft' => $data['draft'],
             'items' => $data['items'],
@@ -222,7 +225,7 @@ class AdminController extends BaseController
         $station = StationModel::findById((int)$menu['menu']['station_id']);
         if (!$station || (int)$station['admin_id'] !== (int)$user['id']) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
         $draftId = (int)$menu['draft']['id'];
@@ -249,7 +252,7 @@ class AdminController extends BaseController
         $station = StationModel::findById((int)$menu['menu']['station_id']);
         if (!$station || (int)$station['admin_id'] !== (int)$user['id']) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
 
@@ -273,7 +276,7 @@ class AdminController extends BaseController
         $reports = ReportService::listReportsByAdmin((int)$user['id'], $filters);
         $stations = StationModel::listByAdmin((int)$user['id']);
         $this->render('admin/reports', [
-            'title' => 'דוחות',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Âª',
             'reports' => $reports,
             'stations' => $stations,
             'filters' => $filters,
@@ -286,13 +289,13 @@ class AdminController extends BaseController
         $report = DailyReportModel::findById((int)$id);
         if (!$report) {
             http_response_code(404);
-            echo 'דוח לא נמצא.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â.';
             return;
         }
         $station = StationModel::findById((int)$report['station_id']);
         if (!$station || (int)$station['admin_id'] !== (int)$user['id']) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
         $wasteItems = DailyWasteItemModel::listByReport((int)$report['id']);
@@ -300,7 +303,7 @@ class AdminController extends BaseController
         $settings = SettingsService::getAll();
         $stepGrams = (int)($settings['weight_step_grams'] ?? 100);
         $this->render('admin/report_edit', [
-            'title' => 'עריכת דוח',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂºÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Âª ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â',
             'report' => $report,
             'menu_items' => $menuItems,
             'waste_items' => $wasteItems,
@@ -315,13 +318,13 @@ class AdminController extends BaseController
         $report = DailyReportModel::findById((int)$id);
         if (!$report) {
             http_response_code(404);
-            echo 'דוח לא נמצא.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â.';
             return;
         }
         $station = StationModel::findById((int)$report['station_id']);
         if (!$station || (int)$station['admin_id'] !== (int)$user['id']) {
             http_response_code(403);
-            echo 'אין הרשאה.';
+            echo 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â.';
             return;
         }
 
@@ -360,7 +363,7 @@ class AdminController extends BaseController
         }
 
         $this->render('admin/planner', [
-            'title' => 'מתכנן ייצור',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚ÂªÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂºÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã‚Â¸ ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¨',
             'data' => $data,
             'date_from' => $dateFrom,
             'date_to' => $dateTo,
@@ -380,7 +383,7 @@ class AdminController extends BaseController
         $actorIds = array_merge([(int)$user['id']], array_map(fn($u) => (int)$u['id'], $stationUsers));
         $logs = AuditLogModel::list($filters, $actorIds);
         $this->render('admin/audit', [
-            'title' => 'לוג פעולות',
+            'title' => 'ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã¢â‚¬â€ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã¢â‚¬â€Ãƒâ€šÃ‚Âª',
             'logs' => $logs,
             'filters' => $filters,
         ]);

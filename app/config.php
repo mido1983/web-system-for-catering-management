@@ -11,6 +11,7 @@ return [
         'name_he' => 'מערכת ניהול הסעדה',
         'base_url' => '',
         'timezone' => 'Asia/Jerusalem',
+        'debug' => false,
     ],
     'session' => [
         'name' => 'catering_sess',

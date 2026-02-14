@@ -91,7 +91,12 @@ $router->get('/sa/admins', [$sa, 'admins'], ['auth' => true, 'roles' => ['SUPERA
 $router->post('/sa/admins', [$sa, 'createAdmin'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->get('/sa/stations', [$sa, 'stations'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->post('/sa/stations', [$sa, 'createStation'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
+$router->post('/sa/stations/update', [$sa, 'updateStation'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
+$router->post('/sa/stations/delete', [$sa, 'deleteStation'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->get('/sa/users', [$sa, 'users'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
+$router->post('/sa/users/create', [$sa, 'createUser'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
+$router->post('/sa/users/update', [$sa, 'updateUser'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
+$router->post('/sa/users/delete', [$sa, 'deleteUser'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->get('/sa/settings', [$sa, 'settings'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->post('/sa/settings', [$sa, 'updateSettings'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->get('/sa/audit', [$sa, 'audit'], ['auth' => true, 'roles' => ['SUPERADMIN']]);

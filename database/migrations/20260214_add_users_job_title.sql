@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN job_title VARCHAR(120) NULL AFTER station_id;

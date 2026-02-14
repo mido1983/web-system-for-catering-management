@@ -14,7 +14,7 @@ class SuperAdminController extends BaseController
     {
         $admins = UserModel::listAdmins();
         $this->render('sa/admins', [
-            'title' => 'מנהלי מערכת',
+            'title' => '????? ?????',
             'admins' => $admins,
         ]);
     }
@@ -33,6 +33,7 @@ class SuperAdminController extends BaseController
             'role' => 'ADMIN',
             'admin_id' => null,
             'station_id' => null,
+            'job_title' => null,
             'must_change_password' => 1,
             'is_active' => 1,
         ]);
@@ -45,7 +46,7 @@ class SuperAdminController extends BaseController
         $stations = StationModel::listAll();
         $admins = UserModel::listAdmins();
         $this->render('sa/stations', [
-            'title' => 'תחנות',
+            'title' => '?????',
             'stations' => $stations,
             'admins' => $admins,
         ]);
@@ -67,20 +68,174 @@ class SuperAdminController extends BaseController
         $this->redirect('/sa/stations');
     }
 
+    public function updateStation(): void
+    {
+        $user = AuthService::currentUser();
+        $stationId = (int)($_POST['station_id'] ?? 0);
+        $name = trim($_POST['name'] ?? '');
+        $adminId = (int)($_POST['admin_id'] ?? 0);
+        $isActive = (int)($_POST['is_active'] ?? 1);
+
+        if ($stationId < 1 || $name === '' || $adminId < 1) {
+            $this->redirect('/sa/stations');
+        }
+
+        $before = StationModel::findById($stationId);
+        if (!$before) {
+            $this->redirect('/sa/stations');
+        }
+
+        StationModel::update($stationId, $name, $adminId, $isActive === 1 ? 1 : 0);
+        $after = StationModel::findById($stationId);
+        AuditService::log((int)$user['id'], 'station_update', 'station', (string)$stationId, $before, $after ?: null);
+        $this->redirect('/sa/stations');
+    }
+
+    public function deleteStation(): void
+    {
+        $user = AuthService::currentUser();
+        $stationId = (int)($_POST['station_id'] ?? 0);
+        if ($stationId < 1) {
+            $this->redirect('/sa/stations');
+        }
+
+        $before = StationModel::findById($stationId);
+        if (!$before) {
+            $this->redirect('/sa/stations');
+        }
+
+        try {
+            StationModel::delete($stationId);
+            AuditService::log((int)$user['id'], 'station_delete', 'station', (string)$stationId, $before, null);
+        } catch (\Throwable $e) {
+            AuditService::log((int)$user['id'], 'station_delete_failed', 'station', (string)$stationId, $before, ['error' => $e->getMessage()]);
+        }
+        $this->redirect('/sa/stations');
+    }
+
     public function users(): void
     {
         $users = UserModel::listAllUsers();
+        $admins = UserModel::listAdmins();
+        $stations = StationModel::listAll();
         $this->render('sa/users', [
-            'title' => 'משתמשים',
+            'title' => '???????',
             'users' => $users,
+            'admins' => $admins,
+            'stations' => $stations,
+            'job_titles' => UserModel::jobTitles(),
         ]);
+    }
+
+    public function createUser(): void
+    {
+        $actor = AuthService::currentUser();
+        $email = trim($_POST['email'] ?? '');
+        $tempPassword = trim($_POST['temp_password'] ?? '');
+        $role = $_POST['role'] ?? 'STATION_USER';
+        $adminId = (int)($_POST['admin_id'] ?? 0);
+        $stationId = (int)($_POST['station_id'] ?? 0);
+        $jobTitle = trim($_POST['job_title'] ?? '');
+
+        if ($email === '' || $tempPassword === '' || !in_array($role, ['SUPERADMIN', 'ADMIN', 'STATION_USER'], true)) {
+            $this->redirect('/sa/users');
+        }
+
+        $data = [
+            'email' => $email,
+            'password_hash' => password_hash($tempPassword, PASSWORD_BCRYPT),
+            'role' => $role,
+            'admin_id' => null,
+            'station_id' => null,
+            'job_title' => null,
+            'must_change_password' => 1,
+            'is_active' => 1,
+        ];
+
+        if ($role === 'STATION_USER') {
+            if (!in_array($jobTitle, UserModel::jobTitles(), true)) {
+                $this->redirect('/sa/users');
+            }
+            $data['admin_id'] = $adminId > 0 ? $adminId : null;
+            $data['station_id'] = $stationId > 0 ? $stationId : null;
+            $data['job_title'] = $jobTitle;
+        }
+
+        $newId = UserModel::create($data);
+        AuditService::log((int)$actor['id'], 'user_create', 'user', (string)$newId, null, ['email' => $email, 'role' => $role]);
+        $this->redirect('/sa/users');
+    }
+
+    public function updateUser(): void
+    {
+        $actor = AuthService::currentUser();
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $email = trim($_POST['email'] ?? '');
+        $role = $_POST['role'] ?? '';
+        $adminId = (int)($_POST['admin_id'] ?? 0);
+        $stationId = (int)($_POST['station_id'] ?? 0);
+        $jobTitle = trim($_POST['job_title'] ?? '');
+        $isActive = (int)($_POST['is_active'] ?? 1);
+
+        if ($userId < 1 || $email === '' || !in_array($role, ['SUPERADMIN', 'ADMIN', 'STATION_USER'], true)) {
+            $this->redirect('/sa/users');
+        }
+
+        $before = UserModel::findById($userId);
+        if (!$before) {
+            $this->redirect('/sa/users');
+        }
+
+        $payload = [
+            'email' => $email,
+            'role' => $role,
+            'admin_id' => null,
+            'station_id' => null,
+            'job_title' => null,
+            'is_active' => $isActive === 1 ? 1 : 0,
+        ];
+        if ($role === 'STATION_USER') {
+            if (!in_array($jobTitle, UserModel::jobTitles(), true)) {
+                $this->redirect('/sa/users');
+            }
+            $payload['admin_id'] = $adminId > 0 ? $adminId : null;
+            $payload['station_id'] = $stationId > 0 ? $stationId : null;
+            $payload['job_title'] = $jobTitle;
+        }
+
+        UserModel::updateUser($userId, $payload);
+        $after = UserModel::findById($userId);
+        AuditService::log((int)$actor['id'], 'user_update', 'user', (string)$userId, $before, $after ?: null);
+        $this->redirect('/sa/users');
+    }
+
+    public function deleteUser(): void
+    {
+        $actor = AuthService::currentUser();
+        $userId = (int)($_POST['user_id'] ?? 0);
+        if ($userId < 1 || $userId === (int)$actor['id']) {
+            $this->redirect('/sa/users');
+        }
+
+        $before = UserModel::findById($userId);
+        if (!$before) {
+            $this->redirect('/sa/users');
+        }
+
+        try {
+            UserModel::delete($userId);
+            AuditService::log((int)$actor['id'], 'user_delete', 'user', (string)$userId, $before, null);
+        } catch (\Throwable $e) {
+            AuditService::log((int)$actor['id'], 'user_delete_failed', 'user', (string)$userId, $before, ['error' => $e->getMessage()]);
+        }
+        $this->redirect('/sa/users');
     }
 
     public function settings(): void
     {
         $settings = SettingsService::getAll();
         $this->render('sa/settings', [
-            'title' => 'הגדרות',
+            'title' => '??????',
             'settings' => $settings,
         ]);
     }
@@ -107,7 +262,7 @@ class SuperAdminController extends BaseController
         ];
         $logs = AuditLogModel::list($filters);
         $this->render('sa/audit', [
-            'title' => 'לוג מערכת',
+            'title' => '??? ?????',
             'logs' => $logs,
             'filters' => $filters,
         ]);

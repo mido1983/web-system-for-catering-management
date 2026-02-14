@@ -47,10 +47,28 @@ class StationModel
         $stmt->execute(['name' => $name, 'id' => $id]);
     }
 
+    public static function update(int $id, string $name, int $adminId, int $active): void
+    {
+        $sql = 'UPDATE stations SET name = :name, admin_id = :admin_id, is_active = :active WHERE id = :id';
+        $stmt = DB::conn()->prepare($sql);
+        $stmt->execute([
+            'id' => $id,
+            'name' => $name,
+            'admin_id' => $adminId,
+            'active' => $active,
+        ]);
+    }
+
     public static function setActive(int $id, int $active): void
     {
         $sql = 'UPDATE stations SET is_active = :active WHERE id = :id';
         $stmt = DB::conn()->prepare($sql);
         $stmt->execute(['active' => $active, 'id' => $id]);
+    }
+
+    public static function delete(int $id): void
+    {
+        $stmt = DB::conn()->prepare('DELETE FROM stations WHERE id = :id');
+        $stmt->execute(['id' => $id]);
     }
 }
