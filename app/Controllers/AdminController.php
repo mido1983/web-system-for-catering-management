@@ -89,9 +89,9 @@ class AdminController extends BaseController
         $firstName = trim($_POST['first_name'] ?? '');
         $lastName = trim($_POST['last_name'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
-        $workHours = trim($_POST['work_hours'] ?? '');
+        $workHours = $this->resolveWorkHours($_POST);
 
-        if ($email === '' || $stationId < 1 || $tempPassword === '' || !in_array($jobTitle, UserModel::jobTitles(), true) || $firstName === '' || $lastName === '' || $phone === '' || $workHours === '') {
+        if ($email === '' || $stationId < 1 || $tempPassword === '' || !in_array($jobTitle, UserModel::jobTitles(), true) || $firstName === '' || $lastName === '' || $phone === '' || $workHours === '' || !$this->isValidWorkHours($workHours)) {
             $this->redirect('/admin/users');
         }
 
@@ -394,5 +394,23 @@ class AdminController extends BaseController
             'logs' => $logs,
             'filters' => $filters,
         ]);
+    }
+
+    private function resolveWorkHours(array $source): string
+    {
+        $start = trim((string)($source['work_start'] ?? ''));
+        $end = trim((string)($source['work_end'] ?? ''));
+        if ($start !== '' && $end !== '') {
+            return $start . ' - ' . $end;
+        }
+        return trim((string)($source['work_hours'] ?? ''));
+    }
+
+    private function isValidWorkHours(string $workHours): bool
+    {
+        if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d\s-\s([01]\d|2[0-3]):[0-5]\d$/', $workHours, $m)) {
+            return false;
+        }
+        return strcmp($m[1], $m[2]) < 0;
     }
 }

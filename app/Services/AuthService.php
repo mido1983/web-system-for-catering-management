@@ -14,6 +14,9 @@ class AuthService
         if (!$user || (int)$user['is_active'] !== 1) {
             return null;
         }
+        if (!UserModel::canLoginRole((string)$user['role'])) {
+            return null;
+        }
         if (!password_verify($password, $user['password_hash'])) {
             return null;
         }
@@ -35,7 +38,7 @@ class AuthService
             return null;
         }
         $user = UserModel::findById((int)$userId);
-        if (!$user || (int)$user['is_active'] !== 1) {
+        if (!$user || (int)$user['is_active'] !== 1 || !UserModel::canLoginRole((string)$user['role'])) {
             self::logout();
             return null;
         }
@@ -68,10 +71,13 @@ class AuthService
         if ($user['role'] === 'SUPERADMIN') {
             return '/sa/admins';
         }
-        if ($user['role'] === 'ADMIN') {
+        if (in_array($user['role'], ['ADMIN', 'STATION_MANAGER'], true)) {
             return '/admin/dashboard';
         }
-        return '/station/today';
+        if (in_array($user['role'], ['DISTRICT_MANAGER', 'AREA_MANAGER'], true)) {
+            return '/sa/users';
+        }
+        return '/login';
     }
 
     public static function adminOwnsStation(int $adminId, int $stationId): bool

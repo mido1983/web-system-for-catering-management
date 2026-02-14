@@ -5,7 +5,7 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('SUPERADMIN','ADMIN','STATION_USER') NOT NULL,
+    role ENUM('SUPERADMIN','DISTRICT_MANAGER','AREA_MANAGER','STATION_MANAGER','ADMIN','STATION_USER') NOT NULL,
     admin_id INT NULL,
     station_id INT NULL,
     job_title VARCHAR(120) NULL,
@@ -24,8 +24,19 @@ CREATE TABLE stations (
     name VARCHAR(255) NOT NULL,
     admin_id INT NOT NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
+    is_cooking_kitchen TINYINT(1) NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_stations_admin_id (admin_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE station_supply_links (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    source_station_id INT NOT NULL,
+    target_station_id INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_station_supply_pair (source_station_id, target_station_id),
+    INDEX idx_station_supply_source (source_station_id),
+    INDEX idx_station_supply_target (target_station_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE dishes (
@@ -148,6 +159,10 @@ CREATE TABLE audit_log (
 
 ALTER TABLE stations
     ADD CONSTRAINT fk_stations_admin FOREIGN KEY (admin_id) REFERENCES users(id);
+
+ALTER TABLE station_supply_links
+    ADD CONSTRAINT fk_station_supply_source FOREIGN KEY (source_station_id) REFERENCES stations(id) ON DELETE CASCADE,
+    ADD CONSTRAINT fk_station_supply_target FOREIGN KEY (target_station_id) REFERENCES stations(id) ON DELETE CASCADE;
 
 ALTER TABLE users
     ADD CONSTRAINT fk_users_admin FOREIGN KEY (admin_id) REFERENCES users(id),

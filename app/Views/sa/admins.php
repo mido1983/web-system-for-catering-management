@@ -1,20 +1,22 @@
-<h1 class="text-2xl font-bold mb-4">מנהלי מערכת</h1>
+<h1 class="text-3xl font-bold mb-4">מנהלי מערכת</h1>
 
-<div class="bg-white p-4 rounded shadow mb-6">
+<div class="surface p-4 mb-6">
     <h2 class="font-bold mb-2">יצירת מנהל תחנה</h2>
-    <form method="post" action="<?php echo e(app_url('/sa/admins')); ?>" class="grid grid-cols-1 md:grid-cols-6 gap-2">
+    <form id="createAdminForm" method="post" action="<?php echo e(app_url('/sa/admins')); ?>" class="grid grid-cols-1 md:grid-cols-6 gap-2">
         <?php echo csrf_field(); ?>
-        <input class="border p-2" type="text" name="first_name" placeholder="שם פרטי" required>
-        <input class="border p-2" type="text" name="last_name" placeholder="שם משפחה" required>
-        <input class="border p-2" type="text" name="phone" placeholder="טלפון" required>
-        <input class="border p-2" type="text" name="work_hours" placeholder="שעות עבודה" required>
-        <input class="border p-2" type="email" name="email" placeholder="אימייל" required>
-        <input class="border p-2" type="text" name="temp_password" placeholder="סיסמה זמנית" required>
-        <button class="bg-blue-600 text-white rounded px-4">צור מנהל</button>
+        <input class="input-modern" type="text" name="first_name" placeholder="שם פרטי" required>
+        <input class="input-modern" type="text" name="last_name" placeholder="שם משפחה" required>
+        <input class="input-modern" type="text" name="phone" placeholder="טלפון" required>
+        <input class="input-modern" type="time" name="work_start" required>
+        <input class="input-modern" type="time" name="work_end" required>
+        <input type="hidden" name="work_hours" id="create_admin_work_hours">
+        <input class="input-modern" type="email" name="email" placeholder="אימייל" required>
+        <input class="input-modern" type="text" name="temp_password" placeholder="סיסמה זמנית" required>
+        <button class="btn-primary">צור מנהל</button>
     </form>
 </div>
 
-<div class="bg-white rounded shadow">
+<div class="surface overflow-x-auto">
     <table class="w-full text-sm">
         <thead>
             <tr class="border-b">
@@ -40,3 +42,21 @@
         </tbody>
     </table>
 </div>
+
+<script>
+(function () {
+    const form = document.getElementById('createAdminForm');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+        const start = form.querySelector('input[name="work_start"]').value;
+        const end = form.querySelector('input[name="work_end"]').value;
+        if (!start || !end || start >= end) {
+            e.preventDefault();
+            alert('יש להזין שעות עבודה תקינות: התחלה מוקדמת מסיום.');
+            return;
+        }
+        document.getElementById('create_admin_work_hours').value = `${start} - ${end}`;
+    });
+})();
+</script>

@@ -71,7 +71,7 @@ $user = current_user();
                             <a class="nav-pill" href="<?php echo e(app_url('/sa/users')); ?>">משתמשים</a>
                             <a class="nav-pill" href="<?php echo e(app_url('/sa/settings')); ?>">הגדרות</a>
                             <a class="nav-pill" href="<?php echo e(app_url('/sa/audit')); ?>">לוג</a>
-                        <?php elseif ($user['role'] === 'ADMIN'): ?>
+                        <?php elseif (in_array($user['role'], ['ADMIN', 'STATION_MANAGER'], true)): ?>
                             <a class="nav-pill" href="<?php echo e(app_url('/admin/dashboard')); ?>">דשבורד</a>
                             <a class="nav-pill" href="<?php echo e(app_url('/admin/stations')); ?>">תחנות</a>
                             <a class="nav-pill" href="<?php echo e(app_url('/admin/users')); ?>">משתמשים</a>
@@ -79,6 +79,8 @@ $user = current_user();
                             <a class="nav-pill" href="<?php echo e(app_url('/admin/reports')); ?>">דוחות</a>
                             <a class="nav-pill" href="<?php echo e(app_url('/admin/planner')); ?>">תכנון</a>
                             <a class="nav-pill" href="<?php echo e(app_url('/admin/audit')); ?>">לוג</a>
+                        <?php elseif (in_array($user['role'], ['DISTRICT_MANAGER', 'AREA_MANAGER'], true)): ?>
+                            <a class="nav-pill" href="<?php echo e(app_url('/sa/users')); ?>">משתמשים</a>
                         <?php else: ?>
                             <a class="nav-pill" href="<?php echo e(app_url('/station/today')); ?>">היום</a>
                             <a class="nav-pill" href="<?php echo e(app_url('/station/history')); ?>">היסטוריה</a>

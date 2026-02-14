@@ -5,6 +5,67 @@ use App\Core\DB;
 
 class UserModel
 {
+    public const ROLE_SUPERADMIN = 'SUPERADMIN';
+    public const ROLE_DISTRICT_MANAGER = 'DISTRICT_MANAGER';
+    public const ROLE_AREA_MANAGER = 'AREA_MANAGER';
+    public const ROLE_STATION_MANAGER = 'STATION_MANAGER';
+    public const ROLE_ADMIN_LEGACY = 'ADMIN';
+    public const ROLE_STATION_USER = 'STATION_USER';
+
+    public static function hierarchyRoles(): array
+    {
+        return [
+            self::ROLE_SUPERADMIN,
+            self::ROLE_DISTRICT_MANAGER,
+            self::ROLE_AREA_MANAGER,
+            self::ROLE_STATION_MANAGER,
+            self::ROLE_STATION_USER,
+        ];
+    }
+
+    public static function userAssignableRoles(): array
+    {
+        return [
+            self::ROLE_SUPERADMIN,
+            self::ROLE_DISTRICT_MANAGER,
+            self::ROLE_AREA_MANAGER,
+            self::ROLE_STATION_MANAGER,
+            self::ROLE_STATION_USER,
+            self::ROLE_ADMIN_LEGACY,
+        ];
+    }
+
+    public static function canLoginRole(string $role): bool
+    {
+        return $role !== self::ROLE_STATION_USER;
+    }
+
+    public static function normalizedManagerRole(string $role): string
+    {
+        return $role === self::ROLE_ADMIN_LEGACY ? self::ROLE_STATION_MANAGER : $role;
+    }
+
+    public static function parentRoleFor(string $role): ?string
+    {
+        $role = self::normalizedManagerRole($role);
+        if ($role === self::ROLE_SUPERADMIN) {
+            return null;
+        }
+        if ($role === self::ROLE_DISTRICT_MANAGER) {
+            return self::ROLE_SUPERADMIN;
+        }
+        if ($role === self::ROLE_AREA_MANAGER) {
+            return self::ROLE_DISTRICT_MANAGER;
+        }
+        if ($role === self::ROLE_STATION_MANAGER) {
+            return self::ROLE_AREA_MANAGER;
+        }
+        if ($role === self::ROLE_STATION_USER) {
+            return self::ROLE_STATION_MANAGER;
+        }
+        return null;
+    }
+
     public static function jobTitles(): array
     {
         return [
@@ -96,8 +157,22 @@ class UserModel
 
     public static function listAdmins(): array
     {
-        $sql = "SELECT id, email, first_name, last_name, phone, work_hours, is_active, created_at FROM users WHERE role = 'ADMIN' ORDER BY id DESC";
+        $sql = "SELECT id, email, first_name, last_name, phone, work_hours, is_active, created_at
+                FROM users
+                WHERE role IN ('ADMIN','STATION_MANAGER')
+                ORDER BY id DESC";
         $stmt = DB::conn()->query($sql);
+        return $stmt->fetchAll();
+    }
+
+    public static function listManagersByRole(string $role): array
+    {
+        $sql = 'SELECT id, email, first_name, last_name, role
+                FROM users
+                WHERE role = :role AND is_active = 1
+                ORDER BY email ASC';
+        $stmt = DB::conn()->prepare($sql);
+        $stmt->execute(['role' => $role]);
         return $stmt->fetchAll();
     }
 

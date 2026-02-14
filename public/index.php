@@ -67,25 +67,25 @@ $router->get('/station/today', [$station, 'today'], ['auth' => true, 'roles' => 
 $router->post('/station/today', [$station, 'submitToday'], ['auth' => true, 'roles' => ['STATION_USER']]);
 $router->get('/station/history', [$station, 'history'], ['auth' => true, 'roles' => ['STATION_USER']]);
 
-$router->get('/admin/dashboard', [$admin, 'dashboard'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->get('/admin/stations', [$admin, 'stations'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->post('/admin/stations', [$admin, 'updateStation'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->get('/admin/users', [$admin, 'users'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->post('/admin/users/create', [$admin, 'createStationUser'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->post('/admin/users/reset', [$admin, 'resetUserPassword'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->post('/admin/users/toggle', [$admin, 'toggleUser'], ['auth' => true, 'roles' => ['ADMIN']]);
+$router->get('/admin/dashboard', [$admin, 'dashboard'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->get('/admin/stations', [$admin, 'stations'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->post('/admin/stations', [$admin, 'updateStation'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->get('/admin/users', [$admin, 'users'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->post('/admin/users/create', [$admin, 'createStationUser'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->post('/admin/users/reset', [$admin, 'resetUserPassword'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->post('/admin/users/toggle', [$admin, 'toggleUser'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
 
-$router->get('/admin/menus', [$admin, 'menus'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->post('/admin/menus', [$admin, 'createMenu'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->get('/admin/menus/{id}', [$admin, 'editMenu'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->post('/admin/menus/{id}', [$admin, 'saveMenu'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->post('/admin/menus/{id}/publish', [$admin, 'publishMenu'], ['auth' => true, 'roles' => ['ADMIN']]);
+$router->get('/admin/menus', [$admin, 'menus'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->post('/admin/menus', [$admin, 'createMenu'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->get('/admin/menus/{id}', [$admin, 'editMenu'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->post('/admin/menus/{id}', [$admin, 'saveMenu'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->post('/admin/menus/{id}/publish', [$admin, 'publishMenu'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
 
-$router->get('/admin/reports', [$admin, 'reports'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->get('/admin/reports/{id}', [$admin, 'editReport'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->post('/admin/reports/{id}', [$admin, 'updateReport'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->get('/admin/planner', [$admin, 'planner'], ['auth' => true, 'roles' => ['ADMIN']]);
-$router->get('/admin/audit', [$admin, 'audit'], ['auth' => true, 'roles' => ['ADMIN']]);
+$router->get('/admin/reports', [$admin, 'reports'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->get('/admin/reports/{id}', [$admin, 'editReport'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->post('/admin/reports/{id}', [$admin, 'updateReport'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->get('/admin/planner', [$admin, 'planner'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
+$router->get('/admin/audit', [$admin, 'audit'], ['auth' => true, 'roles' => ['ADMIN', 'STATION_MANAGER']]);
 
 $router->get('/sa/admins', [$sa, 'admins'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->post('/sa/admins', [$sa, 'createAdmin'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
@@ -93,10 +93,10 @@ $router->get('/sa/stations', [$sa, 'stations'], ['auth' => true, 'roles' => ['SU
 $router->post('/sa/stations', [$sa, 'createStation'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->post('/sa/stations/update', [$sa, 'updateStation'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->post('/sa/stations/delete', [$sa, 'deleteStation'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
-$router->get('/sa/users', [$sa, 'users'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
-$router->post('/sa/users/create', [$sa, 'createUser'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
-$router->post('/sa/users/update', [$sa, 'updateUser'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
-$router->post('/sa/users/delete', [$sa, 'deleteUser'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
+$router->get('/sa/users', [$sa, 'users'], ['auth' => true, 'roles' => ['SUPERADMIN', 'DISTRICT_MANAGER', 'AREA_MANAGER']]);
+$router->post('/sa/users/create', [$sa, 'createUser'], ['auth' => true, 'roles' => ['SUPERADMIN', 'DISTRICT_MANAGER', 'AREA_MANAGER']]);
+$router->post('/sa/users/update', [$sa, 'updateUser'], ['auth' => true, 'roles' => ['SUPERADMIN', 'DISTRICT_MANAGER', 'AREA_MANAGER']]);
+$router->post('/sa/users/delete', [$sa, 'deleteUser'], ['auth' => true, 'roles' => ['SUPERADMIN', 'DISTRICT_MANAGER', 'AREA_MANAGER']]);
 $router->get('/sa/settings', [$sa, 'settings'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->post('/sa/settings', [$sa, 'updateSettings'], ['auth' => true, 'roles' => ['SUPERADMIN']]);
 $router->get('/sa/audit', [$sa, 'audit'], ['auth' => true, 'roles' => ['SUPERADMIN']]);

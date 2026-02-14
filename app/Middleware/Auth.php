@@ -36,8 +36,8 @@ class Auth
             return;
         }
 
-        if ($user['role'] === 'ADMIN') {
-            if (!AuthService::adminOwnsStation($user['id'], $stationId)) {
+        if (in_array($user['role'], ['ADMIN', 'STATION_MANAGER'], true)) {
+            if (!AuthService::adminOwnsStation((int)$user['id'], $stationId)) {
                 http_response_code(403);
                 echo 'אין הרשאה.';
                 exit;

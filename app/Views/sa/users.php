@@ -1,13 +1,16 @@
 <?php
 $roleLabels = [
     'SUPERADMIN' => 'SUPERADMIN',
+    'DISTRICT_MANAGER' => 'מנהל מחוז',
+    'AREA_MANAGER' => 'מנהל אזור',
+    'STATION_MANAGER' => 'מנהל תחנה',
     'ADMIN' => 'מנהל תחנה',
     'STATION_USER' => 'עובד',
 ];
 ?>
 <section class="mb-8">
     <h1 class="text-3xl font-extrabold mb-2">משתמשים</h1>
-    <p class="text-slate-500">ניהול הרשאות, תפקידים ופרטי עובד בממשק אחד.</p>
+    <p class="text-slate-500">היררכיה: SUPERADMIN > מנהל מחוז > מנהל אזור > מנהל תחנה. עובד מוצג בתחנה בלבד וללא גישה למערכת.</p>
 </section>
 
 <section class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
@@ -20,30 +23,43 @@ $roleLabels = [
         <div class="text-3xl font-extrabold"><?php echo count(array_filter($users, fn($u) => $u['role'] === 'STATION_USER')); ?></div>
     </div>
     <div class="surface p-6">
-        <div class="text-sm text-slate-500">מנהלי תחנה</div>
-        <div class="text-3xl font-extrabold"><?php echo count(array_filter($users, fn($u) => $u['role'] === 'ADMIN')); ?></div>
+        <div class="text-sm text-slate-500">מנהלים</div>
+        <div class="text-3xl font-extrabold"><?php echo count(array_filter($users, fn($u) => in_array($u['role'], ['DISTRICT_MANAGER', 'AREA_MANAGER', 'STATION_MANAGER', 'ADMIN'], true))); ?></div>
     </div>
 </section>
 
 <section class="surface p-6 mb-8">
     <h2 class="text-xl font-bold mb-3">יצירת משתמש חדש</h2>
-    <form method="post" action="<?php echo e(app_url('/sa/users/create')); ?>" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+    <form id="createUserForm" method="post" action="<?php echo e(app_url('/sa/users/create')); ?>" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
         <?php echo csrf_field(); ?>
         <input class="input-modern" type="text" name="first_name" placeholder="שם פרטי" required>
         <input class="input-modern" type="text" name="last_name" placeholder="שם משפחה" required>
         <input class="input-modern" type="text" name="phone" placeholder="טלפון" required>
-        <input class="input-modern" type="text" name="work_hours" placeholder="שעות עבודה" required>
+        <input class="input-modern" type="time" name="work_start" required>
+        <input class="input-modern" type="time" name="work_end" required>
+        <input type="hidden" name="work_hours" id="create_work_hours">
         <input class="input-modern" type="email" name="email" placeholder="אימייל" required>
         <input class="input-modern" type="text" name="temp_password" placeholder="סיסמה זמנית" required>
         <select class="select-modern" name="role" required>
             <option value="STATION_USER">עובד</option>
-            <option value="ADMIN">מנהל תחנה</option>
+            <option value="STATION_MANAGER">מנהל תחנה</option>
+            <option value="AREA_MANAGER">מנהל אזור</option>
+            <option value="DISTRICT_MANAGER">מנהל מחוז</option>
             <option value="SUPERADMIN">SUPERADMIN</option>
         </select>
         <select class="select-modern" name="admin_id">
-            <option value="">מנהל (אופציונלי)</option>
-            <?php foreach ($admins as $a): ?>
-                <option value="<?php echo (int)$a['id']; ?>"><?php echo e($a['email']); ?></option>
+            <option value="">מנהל ממונה (אופציונלי)</option>
+            <?php foreach (($role_managers['superadmins'] ?? []) as $m): ?>
+                <option value="<?php echo (int)$m['id']; ?>">SUPERADMIN · <?php echo e($m['email']); ?></option>
+            <?php endforeach; ?>
+            <?php foreach (($role_managers['districts'] ?? []) as $m): ?>
+                <option value="<?php echo (int)$m['id']; ?>">מנהל מחוז · <?php echo e($m['email']); ?></option>
+            <?php endforeach; ?>
+            <?php foreach (($role_managers['areas'] ?? []) as $m): ?>
+                <option value="<?php echo (int)$m['id']; ?>">מנהל אזור · <?php echo e($m['email']); ?></option>
+            <?php endforeach; ?>
+            <?php foreach (($role_managers['stations'] ?? []) as $m): ?>
+                <option value="<?php echo (int)$m['id']; ?>">מנהל תחנה · <?php echo e($m['email']); ?></option>
             <?php endforeach; ?>
         </select>
         <select class="select-modern" name="station_id">
@@ -133,23 +149,44 @@ $roleLabels = [
             <h3 class="text-2xl font-bold">עריכת משתמש</h3>
             <button type="button" class="btn-danger" id="closeEditUserModal">סגור</button>
         </div>
-        <form method="post" action="<?php echo e(app_url('/sa/users/update')); ?>" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <form id="editUserForm" method="post" action="<?php echo e(app_url('/sa/users/update')); ?>" class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <?php echo csrf_field(); ?>
             <input type="hidden" name="user_id" id="edit_user_id">
+            <label class="text-sm font-semibold">שם פרטי</label>
+            <label class="text-sm font-semibold">שם משפחה</label>
             <input class="input-modern" type="text" name="first_name" id="edit_first_name" required>
             <input class="input-modern" type="text" name="last_name" id="edit_last_name" required>
+            <label class="text-sm font-semibold">טלפון</label>
+            <label class="text-sm font-semibold">שעת התחלה - שעת סיום</label>
             <input class="input-modern" type="text" name="phone" id="edit_phone" required>
-            <input class="input-modern" type="text" name="work_hours" id="edit_work_hours" required>
+            <div class="grid grid-cols-2 gap-2">
+                <input class="input-modern" type="time" name="work_start" id="edit_work_start" required>
+                <input class="input-modern" type="time" name="work_end" id="edit_work_end" required>
+            </div>
+            <input type="hidden" name="work_hours" id="edit_work_hours">
+            <label class="text-sm font-semibold md:col-span-2">אימייל</label>
             <input class="input-modern md:col-span-2" type="email" name="email" id="edit_email" required>
             <select class="select-modern" name="role" id="edit_role" required>
                 <option value="SUPERADMIN">SUPERADMIN</option>
-                <option value="ADMIN">מנהל תחנה</option>
+                <option value="DISTRICT_MANAGER">מנהל מחוז</option>
+                <option value="AREA_MANAGER">מנהל אזור</option>
+                <option value="STATION_MANAGER">מנהל תחנה</option>
+                <option value="ADMIN">מנהל תחנה (legacy)</option>
                 <option value="STATION_USER">עובד</option>
             </select>
             <select class="select-modern" name="admin_id" id="edit_admin_id">
-                <option value="">None</option>
-                <?php foreach ($admins as $a): ?>
-                    <option value="<?php echo (int)$a['id']; ?>"><?php echo e($a['email']); ?></option>
+                <option value="">מנהל ממונה (אופציונלי)</option>
+                <?php foreach (($role_managers['superadmins'] ?? []) as $m): ?>
+                    <option value="<?php echo (int)$m['id']; ?>">SUPERADMIN · <?php echo e($m['email']); ?></option>
+                <?php endforeach; ?>
+                <?php foreach (($role_managers['districts'] ?? []) as $m): ?>
+                    <option value="<?php echo (int)$m['id']; ?>">מנהל מחוז · <?php echo e($m['email']); ?></option>
+                <?php endforeach; ?>
+                <?php foreach (($role_managers['areas'] ?? []) as $m): ?>
+                    <option value="<?php echo (int)$m['id']; ?>">מנהל אזור · <?php echo e($m['email']); ?></option>
+                <?php endforeach; ?>
+                <?php foreach (($role_managers['stations'] ?? []) as $m): ?>
+                    <option value="<?php echo (int)$m['id']; ?>">מנהל תחנה · <?php echo e($m['email']); ?></option>
                 <?php endforeach; ?>
             </select>
             <select class="select-modern" name="station_id" id="edit_station_id">
@@ -179,12 +216,42 @@ $roleLabels = [
     const closeBtn = document.getElementById('closeEditUserModal');
     if (!modal || !closeBtn) return;
 
+    const createForm = document.getElementById('createUserForm');
+    const editForm = document.getElementById('editUserForm');
+
+    function composeWorkHours(start, end) {
+        if (!start || !end) return '';
+        return `${start} - ${end}`;
+    }
+
+    function parseWorkHours(value) {
+        const m = (value || '').match(/^([0-2]\d:[0-5]\d)\s-\s([0-2]\d:[0-5]\d)$/);
+        if (!m) return { start: '', end: '' };
+        return { start: m[1], end: m[2] };
+    }
+
+    if (createForm) {
+        createForm.addEventListener('submit', (e) => {
+            const start = createForm.querySelector('input[name="work_start"]').value;
+            const end = createForm.querySelector('input[name="work_end"]').value;
+            if (!start || !end || start >= end) {
+                e.preventDefault();
+                alert('יש להזין שעות עבודה תקינות: התחלה מוקדמת מסיום.');
+                return;
+            }
+            document.getElementById('create_work_hours').value = composeWorkHours(start, end);
+        });
+    }
+
     function openModal(dataset) {
         document.getElementById('edit_user_id').value = dataset.id || '';
         document.getElementById('edit_first_name').value = dataset.firstName || '';
         document.getElementById('edit_last_name').value = dataset.lastName || '';
         document.getElementById('edit_phone').value = dataset.phone || '';
-        document.getElementById('edit_work_hours').value = dataset.workHours || '';
+        const parsed = parseWorkHours(dataset.workHours || '');
+        document.getElementById('edit_work_start').value = parsed.start;
+        document.getElementById('edit_work_end').value = parsed.end;
+        document.getElementById('edit_work_hours').value = composeWorkHours(parsed.start, parsed.end);
         document.getElementById('edit_email').value = dataset.email || '';
         document.getElementById('edit_role').value = dataset.role || 'STATION_USER';
         document.getElementById('edit_admin_id').value = dataset.adminId || '';
@@ -206,5 +273,18 @@ $roleLabels = [
     modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
+
+    if (editForm) {
+        editForm.addEventListener('submit', (e) => {
+            const start = document.getElementById('edit_work_start').value;
+            const end = document.getElementById('edit_work_end').value;
+            if (!start || !end || start >= end) {
+                e.preventDefault();
+                alert('יש להזין שעות עבודה תקינות: התחלה מוקדמת מסיום.');
+                return;
+            }
+            document.getElementById('edit_work_hours').value = composeWorkHours(start, end);
+        });
+    }
 })();
 </script>
